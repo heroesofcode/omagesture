@@ -19,6 +19,10 @@ built and tested on a MacBook's internal trackpad under Hyprland; the gesture
 mapping is generic, but see the notes at the bottom for what varies by
 hardware.
 
+The scripts shell out to `hyprctl`, `jq`, `awk`, `sed` and `grep`, and
+`omagesture-diagnose` additionally uses `libinput`. All of these already ship
+with Omarchy, so there is nothing extra to install.
+
 ## Defaults
 
 | Gesture | Action |

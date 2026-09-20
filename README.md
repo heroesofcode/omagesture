@@ -6,10 +6,12 @@ Three fingers slide between workspaces, and the workspace follows your fingers
 in real time rather than jumping at the end of the swipe — that part is
 Hyprland's native `workspace` gesture action, not a script pretending.
 
+![The Omagesture panel in the Omarchy bar](preview.png)
+
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/pedrohfp/omagesture --enable
+omarchy plugin add https://github.com/heroesofcode/omagesture --enable
 ```
 
 Needs Omarchy 4 (for the bar plugin API) and a multi-touch trackpad. It was

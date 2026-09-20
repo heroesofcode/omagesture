@@ -16,7 +16,7 @@
 set -uo pipefail
 
 CONFIG="${OMAGESTURE_HYPRLAND:-$HOME/.config/hypr/hyprland.lua}"
-BEGIN="-- omagesture:begin (managed by io.github.pedrohfp.omagesture — do not edit)"
+BEGIN="-- omagesture:begin (managed by io.github.heroesofcode.omagesture — do not edit)"
 END="-- omagesture:end"
 
 [[ -f $CONFIG ]] || { echo "omagesture-require: $CONFIG not found" >&2; exit 1; }

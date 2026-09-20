@@ -69,7 +69,7 @@ persisting them.
 `omagesture-require`, which appends a marked block to `~/.config/hypr/hyprland.lua`:
 
 ```lua
--- omagesture:begin (managed by io.github.pedrohfp.omagesture — do not edit)
+-- omagesture:begin (managed by io.github.heroesofcode.omagesture — do not edit)
 pcall(require, "hypr.omagesture")
 -- omagesture:end
 ```
@@ -177,8 +177,8 @@ claim the three-finger axis and the second one to load will error.
 ## Uninstall
 
 ```bash
-omarchy plugin disable io.github.pedrohfp.omagesture
-~/.config/omarchy/plugins/io.github.pedrohfp.omagesture/omagesture-require --remove
+omarchy plugin disable io.github.heroesofcode.omagesture
+~/.config/omarchy/plugins/io.github.heroesofcode.omagesture/omagesture-require --remove
 rm ~/.config/hypr/omagesture.lua
 hyprctl reload
 ```

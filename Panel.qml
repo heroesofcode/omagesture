@@ -12,8 +12,8 @@ import "Model.js" as Model
 // wrong instead of two.
 Panel {
   id: root
-  moduleName: "io.github.pedrohfp.omagesture"
-  ipcTarget: "io.github.pedrohfp.omagesture"
+  moduleName: "io.github.heroesofcode.omagesture"
+  ipcTarget: "io.github.heroesofcode.omagesture"
 
   readonly property string scriptPath: Qt.resolvedUrl("omagesture-apply").toString().replace("file://", "")
 

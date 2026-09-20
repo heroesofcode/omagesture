@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "io.github.pedrohfp.omagesture",
+  "id": "io.github.heroesofcode.omagesture",
   "name": "Omagesture",
   "version": "1.0.0",
-  "author": "pedrohfp",
+  "author": "heroesofcode",
   "license": "MIT",
   "description": "MacBook-style multi-touch gestures for Hyprland. Swipe three fingers to slide between workspaces, and map every other swipe and pinch to a window action from the bar.",
   "kinds": [

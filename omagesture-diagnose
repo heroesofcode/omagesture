@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+#
+# omagesture-diagnose — find out which gestures your trackpad actually emits.
+#
+# Not every touchpad reports every gesture. This one, for instance, never
+# reports a pinch above two fingers: squeezing three or four fingers arrives as
+# a horizontal swipe. Mapping an action to a gesture the hardware never sends
+# looks exactly like a broken action, so check here before assuming the config
+# is wrong.
+#
+# Usage:
+#   omagesture-diagnose          swap in the probes and start watching
+#   omagesture-diagnose --stop   put the real gesture config back
+#
+# While running, every mapped gesture is replaced by a probe that raises a
+# desktop notification naming what Hyprland received, and appends it to the
+# log. Your normal gestures do nothing until you stop it.
+
+set -uo pipefail
+
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TARGET="$HOME/.config/hypr/omagesture.lua"
+LOG="${XDG_RUNTIME_DIR:-/tmp}/omagesture-diagnose.log"
+
+if [[ ${1:-} == --stop ]]; then
+  echo "Gestures Hyprland actually received:"
+  if [[ -s $LOG ]]; then
+    sort "$LOG" | uniq -c | sort -rn | sed 's/^/  /'
+  else
+    echo "  (nothing — no gesture reached the compositor at all)"
+  fi
+  rm -f "$LOG"
+  "$SELF_DIR/omagesture-apply" >/dev/null && hyprctl reload >/dev/null 2>&1
+  echo
+  echo "Real gesture config restored."
+  echo "NOTE: restored from built-in defaults. Open the bar widget and change"
+  echo "anything to write your saved settings back over them."
+  exit 0
+fi
+
+: > "$LOG"
+
+{
+  echo "-- TEMPORARY DIAGNOSTIC written by omagesture-diagnose."
+  echo "-- Restore with: omagesture-diagnose --stop"
+  echo 'hl.config({ input = { touchpad = { clickfinger_behavior = true, drag_3fg = 0 } } })'
+  echo
+  echo "local LOG = \"$LOG\""
+  cat <<'LUA'
+
+local function probe(name)
+  local fired = false
+  local function hit()
+    if fired then return end
+    fired = true
+    local f = io.open(LOG, "a")
+    if f then f:write(name .. "\n"); f:close() end
+    hl.notification.create({ text = "gesture: " .. name, timeout = 1500 })
+  end
+  return {
+    start  = function() fired = false end,
+    update = hit,
+    finish = function() fired = false end,
+  }
+end
+
+for _, fingers in ipairs({ 2, 3, 4 }) do
+  for _, dir in ipairs({ "horizontal", "vertical", "pinch" }) do
+    hl.gesture({
+      fingers = fingers,
+      direction = dir,
+      action = probe(fingers .. " fingers " .. string.upper(dir)),
+    })
+  end
+end
+LUA
+} > "$TARGET"
+
+hyprctl reload >/dev/null 2>&1
+
+cat <<EOF
+Diagnostic active. Perform the gestures you care about — each one Hyprland
+recognises raises a notification naming it.
+
+Watch for a gesture arriving under a different name than you intended: a pinch
+reported as HORIZONTAL means libinput classified your squeeze as a swipe, and
+no pinch mapping will ever fire.
+
+When done:  $SELF_DIR/omagesture-diagnose --stop
+EOF

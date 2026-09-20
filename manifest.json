@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.pedrohfp.omagesture",
+  "name": "Omagesture",
+  "version": "1.0.0",
+  "author": "pedrohfp",
+  "license": "MIT",
+  "description": "MacBook-style multi-touch gestures for Hyprland. Swipe three fingers to slide between workspaces, and map every other swipe and pinch to a window action from the bar.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Omagesture",
+    "description": "Map trackpad swipes and pinches to workspace and window actions, and tune click behaviour, without leaving the bar.",
+    "category": "Input",
+    "aliases": [
+      "gesture",
+      "gestures",
+      "trackpad",
+      "touchpad",
+      "swipe",
+      "pinch",
+      "workspace",
+      "macbook"
+    ],
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "enabled": true,
+      "naturalScroll": true,
+      "clickMethod": "clickfinger",
+      "drag": "off",
+      "middleButton": "move",
+      "swipeRange": "numbered",
+      "swipeForever": false,
+      "g2PinchIn": "none",
+      "g2PinchOut": "none",
+      "g3Left": "workspace",
+      "g3Right": "workspace",
+      "g3Up": "menu",
+      "g3Down": "none",
+      "g3PinchIn": "none",
+      "g3PinchOut": "none",
+      "g4Left": "resize_window",
+      "g4Right": "resize_window",
+      "g4Up": "resize_window",
+      "g4Down": "resize_window",
+      "g4PinchIn": "none",
+      "g4PinchOut": "none"
+    },
+    "schema": [
+      {
+        "key": "enabled",
+        "type": "boolean",
+        "label": "Gestures enabled",
+        "defaultValue": true,
+        "description": "Turn every mapped swipe and pinch off at once. Click and scroll tuning still applies."
+      },
+      {
+        "key": "naturalScroll",
+        "type": "boolean",
+        "label": "Natural scrolling",
+        "defaultValue": true,
+        "description": "Content follows your fingers, as on macOS."
+      },
+      {
+        "key": "clickMethod",
+        "type": "enum",
+        "label": "Click method",
+        "options": [
+          "clickfinger",
+          "buttonareas"
+        ],
+        "defaultValue": "clickfinger",
+        "description": "clickfinger: two fingers anywhere is a right click. buttonareas: the bottom-right corner is the right button."
+      },
+      {
+        "key": "drag",
+        "type": "enum",
+        "label": "Multi-finger drag",
+        "options": [
+          "off",
+          "threefinger",
+          "fourfinger"
+        ],
+        "defaultValue": "off",
+        "description": "Drag windows with three or four fingers. Mutually exclusive with swipes of the same finger count — the swipes win."
+      },
+      {
+        "key": "middleButton",
+        "type": "enum",
+        "label": "Middle click (three fingers)",
+        "options": [
+          "none",
+          "resize",
+          "move",
+          "screenshot",
+          "paste"
+        ],
+        "defaultValue": "move",
+        "description": "With clickfinger, the middle button is a three-finger click. move/resize turn a three-finger press-and-drag into window handling; move is the one that needs the pointer, since a tiled window swaps with whatever sits under the cursor. Any setting other than none consumes middle click, so applications stop receiving it."
+      },
+      {
+        "key": "swipeRange",
+        "type": "enum",
+        "label": "Workspace swipe reaches",
+        "options": [
+          "numbered",
+          "existing"
+        ],
+        "defaultValue": "numbered",
+        "description": "numbered: the swipe targets workspaces by number, so it keeps going to 4, 5, 6 even when they are empty. existing: Hyprland's default, which only walks workspaces that are already open and stops one past the last."
+      },
+      {
+        "key": "swipeForever",
+        "type": "boolean",
+        "label": "Keep swiping without lifting",
+        "defaultValue": false,
+        "description": "Cross several workspaces in one continuous motion instead of one per swipe."
+      },
+      {
+        "key": "g2PinchIn",
+        "type": "enum",
+        "label": "Two fingers · pinch in",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "none",
+        "description": "Two-finger pinch is consumed by the compositor, so browsers and image viewers lose their own pinch-to-zoom while it is mapped."
+      },
+      {
+        "key": "g2PinchOut",
+        "type": "enum",
+        "label": "Two fingers · pinch out",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "none",
+        "description": "Two-finger pinch is consumed by the compositor, so browsers and image viewers lose their own pinch-to-zoom while it is mapped."
+      },
+      {
+        "key": "g3Left",
+        "type": "enum",
+        "label": "Three fingers · left",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "workspace"
+      },
+      {
+        "key": "g3Right",
+        "type": "enum",
+        "label": "Three fingers · right",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "workspace"
+      },
+      {
+        "key": "g3Up",
+        "type": "enum",
+        "label": "Three fingers · up",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "menu"
+      },
+      {
+        "key": "g3Down",
+        "type": "enum",
+        "label": "Three fingers · down",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "none"
+      },
+      {
+        "key": "g3PinchIn",
+        "type": "enum",
+        "label": "Three fingers · pinch in",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "none"
+      },
+      {
+        "key": "g3PinchOut",
+        "type": "enum",
+        "label": "Three fingers · pinch out",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "none"
+      },
+      {
+        "key": "g4Left",
+        "type": "enum",
+        "label": "Four fingers · left",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "resize_window"
+      },
+      {
+        "key": "g4Right",
+        "type": "enum",
+        "label": "Four fingers · right",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "resize_window"
+      },
+      {
+        "key": "g4Up",
+        "type": "enum",
+        "label": "Four fingers · up",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "resize_window"
+      },
+      {
+        "key": "g4Down",
+        "type": "enum",
+        "label": "Four fingers · down",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "resize_window"
+      },
+      {
+        "key": "g4PinchIn",
+        "type": "enum",
+        "label": "Four fingers · pinch in",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "none"
+      },
+      {
+        "key": "g4PinchOut",
+        "type": "enum",
+        "label": "Four fingers · pinch out",
+        "options": [
+          "none",
+          "workspace",
+          "special",
+          "fullscreen",
+          "maximize",
+          "float",
+          "move_window",
+          "resize_window",
+          "close_window",
+          "zoom",
+          "menu"
+        ],
+        "defaultValue": "none"
+      }
+    ]
+  }
+}

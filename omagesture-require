@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+#
+# Make sure ~/.config/hypr/hyprland.lua loads the file omagesture-apply writes.
+#
+# Idempotent: appends a marker-delimited block once, then does nothing. The
+# markers follow the convention Omalang uses for its managed bind block, so a
+# reader of hyprland.lua meets the same shape twice rather than two inventions.
+#
+# Pass --remove to take the block back out (used by uninstall).
+#
+# The block goes last on purpose. Hyprland cannot unbind a gesture, so the
+# first registration of an axis wins and later ones error as "overshadowed";
+# loading last means a hand-written gesture in input.lua quietly takes
+# precedence over ours instead of breaking the config.
+
+set -uo pipefail
+
+CONFIG="${OMAGESTURE_HYPRLAND:-$HOME/.config/hypr/hyprland.lua}"
+BEGIN="-- omagesture:begin (managed by io.github.pedrohfp.omagesture — do not edit)"
+END="-- omagesture:end"
+
+[[ -f $CONFIG ]] || { echo "omagesture-require: $CONFIG not found" >&2; exit 1; }
+
+write_atomic() { # content on stdin
+  local dir tmp
+  dir="$(dirname -- "$CONFIG")"
+  tmp="$(mktemp "$dir/.omagesture-require.XXXXXX")" || exit 1
+  chmod 644 "$tmp" 2>/dev/null
+  cat > "$tmp"
+  mv -f "$tmp" "$CONFIG"
+}
+
+if [[ ${1:-} == --remove ]]; then
+  grep -qF "omagesture:begin" "$CONFIG" || exit 0
+  # Drop the block, then trim the blank lines it leaves at the end of the file.
+  # Without the trim, the separator newline we add on install would stack up a
+  # line per remove/install cycle.
+  awk -v b="omagesture:begin" -v e="omagesture:end" '
+    index($0, b) { skip = 1 }
+    !skip        { lines[++n] = $0 }
+    index($0, e) { skip = 0 }
+    END {
+      while (n > 0 && lines[n] == "") n--
+      for (i = 1; i <= n; i++) print lines[i]
+    }
+  ' "$CONFIG" | write_atomic
+  echo "omagesture-require: removed the require block from $CONFIG"
+  exit 0
+fi
+
+grep -qF "omagesture:begin" "$CONFIG" && exit 0
+
+{
+  cat -- "$CONFIG"
+  printf '\n%s\n' "$BEGIN"
+  printf '%s\n' 'pcall(require, "hypr.omagesture")'
+  printf '%s\n' "$END"
+} | write_atomic
+
+echo "omagesture-require: added the require block to $CONFIG"

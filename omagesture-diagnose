@@ -20,11 +20,28 @@ set -uo pipefail
 
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET="$HOME/.config/hypr/omagesture.lua"
-LOG="${XDG_RUNTIME_DIR:-/tmp}/omagesture-diagnose.log"
+
+# XDG_RUNTIME_DIR is mode 0700 and user-owned — safe to create files there.
+# /tmp is world-writable; a predictable path there is vulnerable to a symlink
+# attack where another local user pre-creates the name as a symlink, causing
+# truncating redirection to clobber an arbitrary file owned by this user.
+RTDIR="${XDG_RUNTIME_DIR:-}"
+[[ -n $RTDIR && -d $RTDIR ]] || {
+  echo "omagesture-diagnose: XDG_RUNTIME_DIR is not set or missing." >&2
+  echo "This is unusual in a desktop session. Cannot create a secure log file." >&2
+  exit 1
+}
+STATE="$RTDIR/omagesture-diagnose.state"
 
 if [[ ${1:-} == --stop ]]; then
+  if [[ ! -f $STATE ]]; then
+    echo "omagesture-diagnose: not running (no state at $STATE)" >&2
+    exit 1
+  fi
+  LOG=$(cat "$STATE")
+  rm -f "$STATE"
   echo "Gestures Hyprland actually received:"
-  if [[ -s $LOG ]]; then
+  if [[ -f $LOG && -s $LOG ]]; then
     sort "$LOG" | uniq -c | sort -rn | sed 's/^/  /'
   else
     echo "  (nothing — no gesture reached the compositor at all)"
@@ -38,7 +55,12 @@ if [[ ${1:-} == --stop ]]; then
   exit 0
 fi
 
-: > "$LOG"
+# mktemp creates the file with mode 0600; the private path is written to the
+# state file so --stop can find it even if the environment changes.
+LOG=$(mktemp -p "$RTDIR" omagesture-diagnose.XXXXXX)
+chmod 0600 "$LOG"
+printf '%s' "$LOG" > "$STATE"
+chmod 0600 "$STATE"
 
 {
   echo "-- TEMPORARY DIAGNOSTIC written by omagesture-diagnose."
